@@ -20,6 +20,7 @@ function setup() {
     gallery.addVisual(new ClimateChange());
     gallery.addVisual(new Waffles());
     gallery.addVisual(new foodDataUK());
+    gallery.addVisual(new sgDebt());
     }
 
     function draw() {

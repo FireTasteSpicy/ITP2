@@ -1,19 +1,31 @@
+//Create a stacked area chart with the values based on each row of the data, the first row
+//is the quarter of the year while the first column is the category of debt. The stacked area
+//chart will have 2 sliders at the bottom which controls the values shown on the display, with
+//the first slider controlling the earliest quarter while the second slider controls the latest
+//quarter.
+
 function sgDebt(){
+
+
     //Object Properties
     this.name = 'SG Debt';
     this.id = 'sg-debt';
     this.title = 'SG Debt';
     this.loaded = false;
 
-    var slider;
-    var data;
-    var dataArray = [];
-    
+    //Data
+    let slider;
+    let data;
+    let dataArray = [];
+    let quarters = [];
+    let categories = [];
+
+
     //Names for each axis
     this.xAxisLabel = 'Quarter';
     this.yAxisLabel = 'Debt (SGD)';
 
-    var marginSize = 35;
+    let marginSize = 35;
 
     this.layout = {
         marginSize: marginSize,
@@ -45,12 +57,12 @@ function sgDebt(){
 
     //preload the csv file
     this.preload = function(){
-        var self = this;
-        data = loadTable("./data/sg-debt/sg-debt.csv", "csv", "header",
+        let self = this;
+        this.data = loadTable("./data/sg-debt/sg-debt.csv", "csv",
         function(data) {
             self.loaded = true;
         });
-        data.trim();
+        this.data.trim();
     };
     
     this.setup = function() {
@@ -58,13 +70,25 @@ function sgDebt(){
         textSize(16);
         textAlign('center', 'center');
 
-        for (i = 1; i < data.getColumnCount() + 1; i++){
-            for (j = 1; j < data.getRowCount() + 1; j++){
-                dataArray.push(data.getNum(j, i));
-            }
-        }    
+        console.log(this.data);
 
-        console.log(dataArray);
+
+        //Populate dataArray
+        this.categories = this.data.getColumn(0);
+        this.data.removeColumn(0);
+        this.quarters = this.data.getRow(0);
+        this.data.removeRow(0);
+
+        this.dataArray = this.data.getArray();
+
+        console.log(this.dataArray);
+
+        for (let i = 0; i < this.dataArray.length; i++) {
+            for(let j = 0; j < this.dataArray[i].length; j++){
+                this.dataArray[i][j] = parseInt(this.dataArray[i][j]);
+            }
+        }
+
 
         // create a slider
         slider = createSlider(1, data.getColumnCount(), 0);
@@ -113,7 +137,5 @@ function sgDebt(){
     //     }
     //     endShape();
     //     }   
-
-    console.log(xAxisLabel);
-    }    
-}  
+    }  
+}

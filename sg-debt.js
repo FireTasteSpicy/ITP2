@@ -14,9 +14,9 @@ function sgDebt(){
     this.loaded = false;
 
     //Data
-    let slider;
+    let startSlider;
+    let endSlider;
     let data;
-    let dataArray = [];
     let quarters = [];
     let categories = [];
 
@@ -70,72 +70,106 @@ function sgDebt(){
         textSize(16);
         textAlign('center', 'center');
 
-        console.log(this.data);
-
-
-        //Populate dataArray
+        //Header
         this.categories = this.data.getColumn(0);
-        this.data.removeColumn(0);
         this.quarters = this.data.getRow(0);
-        this.data.removeRow(0);
 
-        this.dataArray = this.data.getArray();
-
-        console.log(this.dataArray);
-
-        for (let i = 0; i < this.dataArray.length; i++) {
-            for(let j = 0; j < this.dataArray[i].length; j++){
-                this.dataArray[i][j] = parseInt(this.dataArray[i][j]);
+        //find the highest total for each column
+        this.maxTotal = 0;
+        for (let i = 1; i < this.data.getColumnCount(); i++) {
+            this.columnTotal = 0;
+            for (let j = 1; j < this.data.getRowCount(); j++){
+                this.columnTotal += this.data.getNum(j, i);
+            }
+            if (this.columnTotal > this.maxTotal){
+                this.maxTotal = this.columnTotal;
             }
         }
-
+        
+        // Count the number of frames drawn since the visualisation
+        // started so that we can animate the plot.
+        this.frameCount = 0;
 
         // create a slider
-        slider = createSlider(1, data.getColumnCount(), 0);
-        slider.position(10, 10);
-        slider.style('width', '80px');
+        // this.startSlider = createSlider(1, this.data.getColumnCount(), 1, 1);
+        // this.startSlider.position(10, 10);
+        // this.startSlider.style('width', '80px');
+
+        // this.endSlider = createSlider(1, this.data.getColumnCount(), this.data.getColumnCount(), 1);
+        // this.endSlider.position(10, 40);
+        // this.endSlider.style('width', '80px');
     }
 
     //destroy when changing visualisations
     this.destroy = function(){
-        // yearSlider.remove(); //remove year slider
+        // this.startSlider.remove();
+        // this.endSlider.remove();
     };
     
-    this.dataProcessing = function(){
-    }
-
-
     this.draw = function() {
-    //     background(220);
+        if (!this.loaded) {
+            console.log('Data not yet loaded');
+            return;
+        }
 
-    //     let series1 = [];
-    //     let series2 = [];
+        //Slider, prevents ranges overlapping
+        // if (this.startSlider.value() >= this.endSlider.value()) {
+        //     this.startSlider.value(this.endSlider.value() - 1);
+        // }
+        // this.startQuarter = this.startSlider.value();
+        // this.endQuarter = this.endSlider.value();
 
-    //     // extract data for each series
-    //     for (let i = 1; i < data.getRowCount(); i++) {
-    //         for (let j = 1; j < data.getColumnCount(); j++) {
-    //         series1.push(data.getNum(i, slider.value()));
-    //         series2.push(data.getNum(i, slider.value() + 1));
-    //     }
 
-    //     // normalise data
-    //     let maxVal = max(series1.concat(series2));
-    //     series1 = series1.map(val => map(val, 0, maxVal, 0, height));
-    //     series2 = series2.map(val => map(val, 0, maxVal, 0, height));
 
-    //     // draw series 1
-    //     beginShape();
-    //     for (let i = 0; i < series1.length; i++) {
-    //         vertex(i * (width / series1.length), height - series1[i]);
-    //     }
-    //     endShape();
 
-    //     // draw series 2
-    //     beginShape();
-    //     for (let i = 0; i < series2.length; i++) {
-    //         vertex(i * (width / series2.length), height - series1[i] - series2[i]);
-    //     }
-    //     endShape();
-    //     }   
+        background(220);
+
+        // Draw x and y axis.
+        drawAxis(this.layout);
+
+        // Draw x and y axis labels.
+        drawAxisLabels(this.xAxisLabel,
+                    this.yAxisLabel,
+                    this.layout);
+
+        let seriesBelow = [];
+        let seriesTop = [];
+
+        if (seriesBelow.length == 0) {
+            for (let i = 1; i < this.data.getColumnCount(); i++) {
+                seriesBelow.push(0);
+                seriesTop.push(this.data.getNum(1, i));
+            }
+            console.log(seriesTop);
+        }
+
+        vector = createVector(0, 0);
+        
+        // // extract data for each series
+        // for (let i = 1; i < data.getRowCount(); i++) {
+        //     for (let j = 1; j < data.getColumnCount(); j++) {
+        //     series1.push(data.getNum(i, slider.value()));
+        //     series2.push(data.getNum(i, slider.value() + 1));
+        // }
+
+        // // normalise data
+        // let maxVal = max(series1.concat(series2));
+        // series1 = series1.map(val => map(val, 0, maxVal, 0, height));
+        // series2 = series2.map(val => map(val, 0, maxVal, 0, height));
+
+        // // draw series 1
+        // beginShape();
+        // for (let i = 0; i < series1.length; i++) {
+        //     vertex(i * (width / series1.length), height - series1[i]);
+        // }
+        // endShape();
+
+        // // draw series 2
+        // beginShape();
+        // for (let i = 0; i < series2.length; i++) {
+        //     vertex(i * (width / series2.length), height - series1[i] - series2[i]);
+        // }
+        // endShape();
+        // }   
     }  
 }

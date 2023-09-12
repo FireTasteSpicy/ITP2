@@ -86,6 +86,12 @@ function sgDebt(){
             }
         }
         
+        console.log(this.layout.leftMargin);
+        console.log(this.layout.bottomMargin);
+        console.log(this.layout.rightMargin);
+        console.log(this.data.getColumnCount());
+
+
         // Count the number of frames drawn since the visualisation
         // started so that we can animate the plot.
         this.frameCount = 0;
@@ -123,6 +129,7 @@ function sgDebt(){
 
 
         background(220);
+        noStroke();
 
         // Draw x and y axis.
         drawAxis(this.layout);
@@ -140,36 +147,43 @@ function sgDebt(){
                 seriesBelow.push(0);
                 seriesTop.push(this.data.getNum(1, i));
             }
-            console.log(seriesTop);
         }
 
-        vector = createVector(0, 0);
-        
-        // // extract data for each series
-        // for (let i = 1; i < data.getRowCount(); i++) {
-        //     for (let j = 1; j < data.getColumnCount(); j++) {
-        //     series1.push(data.getNum(i, slider.value()));
-        //     series2.push(data.getNum(i, slider.value() + 1));
-        // }
+        for (let i = 1; i < this.data.getRowCount(); i++) {
+            fill (i * 40, i * 40, i * 40, 150);
+            // beginShape(LINES);
+            for (let j = 0; j < this.data.getColumnCount(); j++) {
+                // vertex(this.mapQuarterValueToWidth(j), this.mapDebtValueToHeight(seriesBelow[j]));
+                console.log(seriesBelow[j]);
+                console.log(seriesTop[j]);
+                console.log(this.mapQuarterValueToWidth(j));
+                line()
+            }   
 
-        // // normalise data
-        // let maxVal = max(series1.concat(series2));
-        // series1 = series1.map(val => map(val, 0, maxVal, 0, height));
-        // series2 = series2.map(val => map(val, 0, maxVal, 0, height));
-
-        // // draw series 1
-        // beginShape();
-        // for (let i = 0; i < series1.length; i++) {
-        //     vertex(i * (width / series1.length), height - series1[i]);
-        // }
-        // endShape();
-
-        // // draw series 2
-        // beginShape();
-        // for (let i = 0; i < series2.length; i++) {
-        //     vertex(i * (width / series2.length), height - series1[i] - series2[i]);
-        // }
-        // endShape();
-        // }   
-    }  
+            for (let j = this.data.getColumnCount() - 1; j > 1; j--) {
+                // vertex(this.mapQuarterValueToWidth(j), this.mapDebtValueToHeight(seriesTop[j]));
+            }
+            // endShape();
+            console.log("count");
+            seriesBelow = seriesTop;
+            seriesTop = [];
+            for (let j = 1; j < this.data.getColumnCount(); j++) {
+                seriesTop.push(seriesBelow[j - 1] + this.data.getNum(i+1, j));
+            }
+        }
+    }
+    this.mapQuarterValueToWidth = function(value) {
+        return map(value,
+                    0,
+                    this.data.getColumnCount()),
+                    this.layout.leftMargin,
+                    this.layout.rightMargin;
+    }
+    this.mapDebtValueToHeight = function(debt) {
+        return map(debt,
+                    0,
+                    this.maxTotal,
+                    this.layout.bottomMargin,
+                    this.layout.topMargin);
+    }
 }

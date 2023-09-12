@@ -17,9 +17,6 @@ function sgDebt(){
     let startSlider;
     let endSlider;
     let data;
-    let quarters = [];
-    let categories = [];
-
 
     //Names for each axis
     this.xAxisLabel = 'Quarter';
@@ -70,9 +67,7 @@ function sgDebt(){
         textSize(16);
         textAlign('center', 'center');
 
-        //Header
-        this.categories = this.data.getColumn(0);
-        this.quarters = this.data.getRow(0);
+        background(220);
 
         //find the highest total for each column
         this.maxTotal = 0;
@@ -85,25 +80,13 @@ function sgDebt(){
                 this.maxTotal = this.columnTotal;
             }
         }
-        
-        console.log(this.layout.leftMargin);
-        console.log(this.layout.bottomMargin);
-        console.log(this.layout.rightMargin);
-        console.log(this.data.getColumnCount());
+
 
 
         // Count the number of frames drawn since the visualisation
         // started so that we can animate the plot.
         this.frameCount = 0;
 
-        // create a slider
-        // this.startSlider = createSlider(1, this.data.getColumnCount(), 1, 1);
-        // this.startSlider.position(10, 10);
-        // this.startSlider.style('width', '80px');
-
-        // this.endSlider = createSlider(1, this.data.getColumnCount(), this.data.getColumnCount(), 1);
-        // this.endSlider.position(10, 40);
-        // this.endSlider.style('width', '80px');
     }
 
     //destroy when changing visualisations
@@ -118,26 +101,14 @@ function sgDebt(){
             return;
         }
 
-        //Slider, prevents ranges overlapping
-        // if (this.startSlider.value() >= this.endSlider.value()) {
-        //     this.startSlider.value(this.endSlider.value() - 1);
-        // }
-        // this.startQuarter = this.startSlider.value();
-        // this.endQuarter = this.endSlider.value();
-
-
-
-
-        background(220);
-        noStroke();
 
         // Draw x and y axis.
-        drawAxis(this.layout);
+        // drawAxis(this.layout);
 
-        // Draw x and y axis labels.
-        drawAxisLabels(this.xAxisLabel,
-                    this.yAxisLabel,
-                    this.layout);
+        // // Draw x and y axis labels.
+        // drawAxisLabels(this.xAxisLabel,
+        //             this.yAxisLabel,
+        //             this.layout);
 
         let seriesBelow = [];
         let seriesTop = [];
@@ -147,31 +118,52 @@ function sgDebt(){
                 seriesBelow.push(0);
                 seriesTop.push(this.data.getNum(1, i));
             }
+        }   
+
+        
+        // Ensure seriesBelow and seriesTop are initialized (Issue 1)
+        if (seriesBelow.length === 0) {
+            // Initialize seriesBelow based on the first row of your CSV data, if needed
         }
 
-        for (let i = 1; i < this.data.getRowCount(); i++) {
-            fill (i * 40, i * 40, i * 40, 150);
-            // beginShape(LINES);
-            for (let j = 0; j < this.data.getColumnCount(); j++) {
-                // vertex(this.mapQuarterValueToWidth(j), this.mapDebtValueToHeight(seriesBelow[j]));
-                console.log(seriesBelow[j]);
-                console.log(seriesTop[j]);
-                console.log(this.mapQuarterValueToWidth(j));
-                line()
-            }   
+        // Ensure these mapping functions are defined and working as expected (Issue 2)
+        // this.mapQuarterValueToWidth(j)
+        // this.mapDebtValueToHeight(seriesBelow[j])
 
-            for (let j = this.data.getColumnCount() - 1; j > 1; j--) {
-                // vertex(this.mapQuarterValueToWidth(j), this.mapDebtValueToHeight(seriesTop[j]));
+        for (let i = 1; i < this.data.getRowCount() - 1; i++) {
+            fill(i * 40, i * 40, i * 40, 150);
+            beginShape(POINTS);
+            
+            // Loop range aligned with seriesBelow and seriesTop (Issue 4)
+            for (let j = 0; j < this.data.getColumnCount() - 1; j++) {
+                vertex(this.mapQuarterValueToWidth(j), this.mapDebtValueToHeight(seriesBelow[j]));
             }
-            // endShape();
-            console.log("count");
+
+            // Modified loop range to include j = 0 and j = 1 (Issue 5)
+            for (let j = this.data.getColumnCount() - 1; j >= 0; j--) { 
+                vertex(this.mapQuarterValueToWidth(j), this.mapDebtValueToHeight(seriesTop[j]));
+            }
+            
+            // Use CLOSE to properly close the shape (Issue 5)
+            endShape();  
+            
+            // Update seriesBelow for the next iteration
             seriesBelow = seriesTop;
             seriesTop = [];
+
+            // Assuming this.data.getNum(i+1, j) gets the numeric value from the CSV (Issue 3)
             for (let j = 1; j < this.data.getColumnCount(); j++) {
-                seriesTop.push(seriesBelow[j - 1] + this.data.getNum(i+1, j));
+                console.log(this.data.getColumnCount());
+                console.log(seriesBelow[j-1]);
+                console.log(i+1, j)
+                console.log(this.data.getNum(i+1, j));
+                seriesTop.push((seriesBelow[j]) + this.data.getNum(i+1, j));
             }
         }
+    
     }
+
+    //Helper Functions
     this.mapQuarterValueToWidth = function(value) {
         return map(value,
                     0,

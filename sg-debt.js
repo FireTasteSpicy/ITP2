@@ -22,7 +22,8 @@ function sgDebt(){
     this.xAxisLabel = 'Quarter';
     this.yAxisLabel = 'Debt (SGD)';
 
-    let marginSize = 35;
+
+    let marginSize = 50;
 
     this.layout = {
         marginSize: marginSize,
@@ -36,20 +37,20 @@ function sgDebt(){
         pad: 5,
 
         plotWidth: function() {
-        return this.rightMargin - this.leftMargin;
+            return this.rightMargin - this.leftMargin;
         },
 
         plotHeight: function() {
-        return this.bottomMargin - this.topMargin;
+            return this.bottomMargin - this.topMargin;
         },
 
         // Boolean to enable/disable background grid.
-        grid: false,
+        grid: true,
 
         // Number of axis tick labels to draw so that they are not drawn on
         // top of one another.
-        numXTickLabels: 8,
-        numYTickLabels: 8,
+        numXTickLabels: 10,
+        numYTickLabels: 10,
     };
 
     //preload the csv file
@@ -80,9 +81,6 @@ function sgDebt(){
                 this.maxTotal = this.columnTotal;
             }
         }
-
-
-
         // Count the number of frames drawn since the visualisation
         // started so that we can animate the plot.
         this.frameCount = 0;
@@ -101,15 +99,45 @@ function sgDebt(){
             return;
         }
 
-
+        this.drawLabels();
+        this.drawData();
+        this.drawLegend();
+    }
+        
+    this.drawLabels = function() {
         // Draw x and y axis.
-        // drawAxis(this.layout);
+        drawAxis(this.layout);
 
-        // // Draw x and y axis labels.
-        // drawAxisLabels(this.xAxisLabel,
-        //             this.yAxisLabel,
-        //             this.layout);
+        // Draw x and y axis labels.
+        drawAxisLabels(this.xAxisLabel,
+                    this.yAxisLabel,
+                    this.layout);
 
+
+        // Draw Y-Axis tick labels
+        drawYAxisTickLabels(
+            0, // min value
+            this.maxTotal, // max value
+            this.layout,
+            this.mapDebtValueToHeight.bind(this), // bind the method to 'this'
+            0
+        );
+
+
+        // Draw X-Axis tick labels
+        for (i = 0; i < this.layout.numXTickLabels + 1; i++) {
+            var numTick = floor(this.data.getColumnCount()/this.layout.numXTickLabels);
+            var distTick = floor(this.layout.plotWidth()/(this.layout.numXTickLabels));
+
+            text(this.data.getString(0, i * numTick + 1),
+                i * distTick + this.layout.leftMargin + this.layout.marginSize/2,
+                this.layout.bottomMargin + textSize());
+        }   
+    }
+
+    this.drawData = function(start, end) {
+        stroke(0);
+        strokeWeight(1);
         let seriesBelow = [];
         let seriesTop = [];
 
@@ -120,56 +148,59 @@ function sgDebt(){
             }
         }   
 
-        
-        // Ensure seriesBelow and seriesTop are initialized (Issue 1)
-        if (seriesBelow.length === 0) {
-            // Initialize seriesBelow based on the first row of your CSV data, if needed
-        }
-
-        // Ensure these mapping functions are defined and working as expected (Issue 2)
-        // this.mapQuarterValueToWidth(j)
-        // this.mapDebtValueToHeight(seriesBelow[j])
-
-        for (let i = 1; i < this.data.getRowCount() - 1; i++) {
-            fill(i * 40, i * 40, i * 40, 150);
-            beginShape(POINTS);
+        for (let i = 1; i < this.data.getRowCount(); i++) {
+            fill(i * 30, i * 30, i * 30, 150);
+            beginShape();
             
-            // Loop range aligned with seriesBelow and seriesTop (Issue 4)
-            for (let j = 0; j < this.data.getColumnCount() - 1; j++) {
+            // Loop range aligned with seriesBelow and seriesTop
+            for (let j = 0; j <= this.data.getColumnCount() - 1; j++) {
                 vertex(this.mapQuarterValueToWidth(j), this.mapDebtValueToHeight(seriesBelow[j]));
             }
 
-            // Modified loop range to include j = 0 and j = 1 (Issue 5)
             for (let j = this.data.getColumnCount() - 1; j >= 0; j--) { 
                 vertex(this.mapQuarterValueToWidth(j), this.mapDebtValueToHeight(seriesTop[j]));
             }
             
-            // Use CLOSE to properly close the shape (Issue 5)
-            endShape();  
+            endShape(CLOSE);  
             
-            // Update seriesBelow for the next iteration
             seriesBelow = seriesTop;
             seriesTop = [];
 
-            // Assuming this.data.getNum(i+1, j) gets the numeric value from the CSV (Issue 3)
-            for (let j = 1; j < this.data.getColumnCount(); j++) {
-                console.log(this.data.getColumnCount());
-                console.log(seriesBelow[j-1]);
-                console.log(i+1, j)
-                console.log(this.data.getNum(i+1, j));
-                seriesTop.push((seriesBelow[j]) + this.data.getNum(i+1, j));
+            // Assuming this.data.getNum(i+1, j) gets the numeric value from the CSV
+            if(i < this.data.getRowCount() - 1) {
+                for (let j = 1; j < this.data.getColumnCount(); j++) {
+                    seriesTop.push((seriesBelow[j-1]) + this.data.getNum(i+1, j));
+                }
             }
         }
-    
     }
+
+    this.drawLegend = function(){
+        // Draw legend
+        fill(255);
+        noStroke();
+        textAlign(LEFT);
+        var textY = this.layout.topMargin + this.layout.pad;
+        var textX = this.layout.leftMargin + this.layout.pad * 2;
+
+        text('Legend', textX, textY);
+        for (var i = 1; i < this.data.getRowCount(); i++) {
+            textY += textSize() + this.layout.pad;
+            fill(i * 30, i * 30, i * 30, 150);
+            rect(textX, textY, 10, 10);
+            fill(0);
+            text(this.data.getString(i, 0), textX + 15, textY + this.layout.pad);
+        }
+    }
+
 
     //Helper Functions
     this.mapQuarterValueToWidth = function(value) {
         return map(value,
                     0,
-                    this.data.getColumnCount()),
+                    this.data.getColumnCount() - 1,
                     this.layout.leftMargin,
-                    this.layout.rightMargin;
+                    this.layout.rightMargin);
     }
     this.mapDebtValueToHeight = function(debt) {
         return map(debt,

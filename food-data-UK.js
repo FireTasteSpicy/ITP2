@@ -63,7 +63,7 @@ function foodDataUK(){
                         }
                         b.data.push(n);
                     }else{
-                         b.data.push(0);
+                        b.data.push(0);
                     }
                 }
                 //add bubble to bubbles array

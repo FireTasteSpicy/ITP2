@@ -13,10 +13,9 @@ function sgDebt(){
     this.title = 'SG Debt';
     this.loaded = false;
 
-    //Data
-    let startSlider;
-    let endSlider;
-    let data;
+    this.data;
+    this.layout;
+    this.selectedCategory = null;
 
     //Names for each axis
     this.xAxisLabel = 'Quarter';
@@ -25,6 +24,7 @@ function sgDebt(){
 
     let marginSize = 50;
 
+    //Layout Variables
     this.layout = {
         marginSize: marginSize,
 
@@ -89,8 +89,6 @@ function sgDebt(){
 
     //destroy when changing visualisations
     this.destroy = function(){
-        // this.startSlider.remove();
-        // this.endSlider.remove();
     };
     
     this.draw = function() {
@@ -99,9 +97,14 @@ function sgDebt(){
             return;
         }
 
+        if (mouseIsPressed) {
+            this.mousePressed();
+        }
+
         this.drawLabels();
         this.drawData();
         this.drawLegend();
+        console.log(this.selectedCategory);
     }
         
     this.drawLabels = function() {
@@ -135,7 +138,7 @@ function sgDebt(){
         }   
     }
 
-    this.drawData = function(start, end) {
+    this.drawData = function() {
         stroke(0);
         strokeWeight(1);
         let seriesBelow = [];
@@ -144,11 +147,25 @@ function sgDebt(){
         if (seriesBelow.length == 0) {
             for (let i = 1; i < this.data.getColumnCount(); i++) {
                 seriesBelow.push(0);
-                seriesTop.push(this.data.getNum(1, i));
+                if(this.selectedCategory == null) {
+                    seriesTop.push(this.data.getNum(1, i));
+                }
+            }
+            
+            for (let i = 1; i < this.data.getRowCount(); i++) {
+                    if(this.selectedCategory == i) {
+                    for (let j = 1; j < this.data.getColumnCount(); j++) {
+                        seriesTop.push(this.data.getNum(i, j));
+                    }
+                }
             }
         }   
 
         for (let i = 1; i < this.data.getRowCount(); i++) {
+            if (this.selectedCategory !== null && i !== this.selectedCategory) {
+                console.log(i);
+                continue;
+            }    
             fill(i * 30, i * 30, i * 30, 150);
             beginShape();
             
@@ -209,4 +226,19 @@ function sgDebt(){
                     this.layout.bottomMargin,
                     this.layout.topMargin);
     }
+    this.mousePressed = function() {
+        var textY = this.layout.topMargin + this.layout.pad;
+    
+        for (var i = 1; i < this.data.getRowCount(); i++) {
+            textY += textSize() + this.layout.pad;
+    
+            if (mouseX > this.layout.leftMargin && mouseX < this.layout.leftMargin + 50 &&
+                mouseY > textY && mouseY < textY + 10) {
+                this.selectedCategory = i;
+                return;
+            }
+        }
+    
+        this.selectedCategory = null;
+    };
 }

@@ -121,6 +121,8 @@ function Waffles(){
             for(var i = 0; i < categories.length; i++){
                 categories[i].boxes = round((categories[i].count/column.length) * (boxes_down * boxes_across));
             }
+
+            console.log(categories);
         }
 
         //add boxes function

@@ -1,45 +1,28 @@
-//Create a stacked area chart with the values based on each row of the data, the first row
-//is the quarter of the year while the first column is the category of debt. The stacked area
-//chart will have 2 sliders at the bottom which controls the values shown on the display, with
-//the first slider controlling the earliest quarter while the second slider controls the latest
-//quarter.
-
 function sgDebt(){
-
-
-    //Object Properties
+    // Initialize object properties
     this.name = 'SG Debt';
     this.id = 'sg-debt';
     this.title = 'SG Debt';
-    this.loaded = false;
+    this.loaded = false;  // Flag to check if data is loaded
+    this.selectedCategory = null;  // Holds the selected debt category
+    this.maxTotalCalculated = false;  // Flag to check if maxTotal is calculated
 
-    this.data;
-    this.layout;
-    this.selectedCategory = null;
-    this.maxTotalCalculated = false;
-
-    //Names for each axis
+    // Axis labels
     this.xAxisLabel = 'Quarter';
-    this.yAxisLabel = 'Debt (Millions)';
+    this.yAxisLabel = 'Debt (SGD)';
 
+    // Layout configuration
     let marginSize = 50;
-
-    //Layout Variables
     this.layout = {
         marginSize: marginSize,
-
-        // Locations of margin positions. Left and bottom have double margin
-        // size due to axis and tick labels.
         leftMargin: marginSize * 2,
         rightMargin: width - marginSize,
         topMargin: marginSize,
         bottomMargin: height - marginSize * 2,
         pad: 5,
-
         plotWidth: function() {
             return this.rightMargin - this.leftMargin;
         },
-
         plotHeight: function() {
             return this.bottomMargin - this.topMargin;
         },
@@ -52,7 +35,6 @@ function sgDebt(){
         numXTickLabels: 10,
         numYTickLabels: 10,
     };
-
     //preload the csv file
     this.preload = function(){
         let self = this;
@@ -60,14 +42,10 @@ function sgDebt(){
         function(data) {
             self.loaded = true;
         });
-        this.data.trim();
     };
-    
     this.setup = function() {
-        //Font
         textSize(16);
         textAlign('center', 'center');
-
         background(220);
 
         //find the highest total for each column
@@ -75,26 +53,17 @@ function sgDebt(){
             this.calculateMaxTotal(this.data.getColumnCount(),this.data.getRowCount());
             this.maxTotalCalculated = true;
         }
-        
-        // Count the number of frames drawn since the visualisation
-        // started so that we can animate the plot.
-        this.frameCount = 0;
-
     }
-
-    //destroy when changing visualisations
-    this.destroy = function(){
-    };
     
     this.draw = function() {
         if (!this.loaded) {
             console.log('Data not yet loaded');
             return;
         }
-
         if (mouseIsPressed) {
             this.mousePressed();
         }
+        //calculates max total debt
         if(this.maxTotalCalculated == false){
             if(this.selectedCategory == null) {
                 this.calculateMaxTotal(this.data.getColumnCount(),this.data.getRowCount());
@@ -118,16 +87,12 @@ function sgDebt(){
             (this.layout.plotWidth() / 2) + this.layout.leftMargin,
             this.layout.marginSize/2);
         textSize(16);
-
-            // Draw x and y axis.
+        // Draw x and y axis.
         drawAxis(this.layout);
-
         // Draw x and y axis labels.
         drawAxisLabels(this.xAxisLabel,
                     this.yAxisLabel,
                     this.layout);
-
-
         // Draw Y-Axis tick labels
         drawYAxisTickLabels(
             0, // min value
@@ -136,7 +101,6 @@ function sgDebt(){
             this.mapDebtValueToHeight.bind(this), // bind the method to 'this'
             0
         );
-
 
         // Draw X-Axis tick labels
         for (i = 0; i < this.layout.numXTickLabels + 1; i++) {
@@ -147,7 +111,6 @@ function sgDebt(){
                 i * distTick + this.layout.leftMargin + this.layout.marginSize/2,
                 this.layout.bottomMargin + textSize());
         }   
-
         if(this.maxTotal == 0) {
             text('Debt is 0', this.layout.leftMargin + this.layout.plotWidth()/2, this.layout.topMargin + this.layout.plotHeight()/2);
         }
@@ -158,7 +121,6 @@ function sgDebt(){
         strokeWeight(1);
         let seriesBelow = [];
         let seriesTop = [];
-
         if (seriesBelow.length == 0) {
             for (let i = 1; i < this.data.getColumnCount(); i++) {
                 seriesBelow.push(0);
@@ -166,7 +128,6 @@ function sgDebt(){
                     seriesTop.push(this.data.getNum(1, i));
                 }
             }
-            
             for (let i = 1; i < this.data.getRowCount(); i++) {
                     if(this.selectedCategory == i) {
                     for (let j = 1; j < this.data.getColumnCount(); j++) {
@@ -175,28 +136,22 @@ function sgDebt(){
                 }
             }
         }   
-
         for (let i = 1; i < this.data.getRowCount(); i++) {
             if (this.selectedCategory !== null && i !== this.selectedCategory) {
                 continue;
             }    
             fill(i * 30, i * 30, i * 30, 150);
             beginShape();
-            
             // Loop range aligned with seriesBelow and seriesTop
             for (let j = 0; j <= this.data.getColumnCount() - 1; j++) {
                 vertex(this.mapQuarterValueToWidth(j), this.mapDebtValueToHeight(seriesBelow[j]));
             }
-
             for (let j = this.data.getColumnCount() - 1; j >= 0; j--) { 
                 vertex(this.mapQuarterValueToWidth(j), this.mapDebtValueToHeight(seriesTop[j]));
             }
-            
             endShape(CLOSE);  
-            
             seriesBelow = seriesTop;
             seriesTop = [];
-
             // Assuming this.data.getNum(i+1, j) gets the numeric value from the CSV
             if(i < this.data.getRowCount() - 1) {
                 for (let j = 1; j < this.data.getColumnCount(); j++) {
@@ -206,8 +161,8 @@ function sgDebt(){
         }
     }
 
+    // Draw legend
     this.drawLegend = function(){
-        // Draw legend
         fill(0);
         noStroke();
         textAlign(LEFT);
@@ -224,7 +179,6 @@ function sgDebt(){
         }
     }
 
-
     //Helper Functions
     this.mapQuarterValueToWidth = function(value) {
         return map(value,
@@ -240,26 +194,24 @@ function sgDebt(){
                     this.layout.bottomMargin,
                     this.layout.topMargin);
     }
+    // Mouse pressed function to handle category selection
     this.mousePressed = function() {
         var textY = this.layout.topMargin + this.layout.pad;
-    
         for (var i = 1; i < this.data.getRowCount(); i++) {
             textY += textSize() + this.layout.pad;
-    
             if (mouseX > this.layout.leftMargin && mouseX < this.layout.leftMargin + 50 &&
                 mouseY > textY && mouseY < textY + 10) {
                 this.selectedCategory = i;
                 this.maxTotalCalculated = false;
-
                 return;
             }
         }
-    
         this.selectedCategory = null;
         this.maxTotalCalculated = false;
-
     }
+    // Helper function to calculate the maximum total debt
     this.calculateMaxTotal = function(column, row) {
+        //calculate overall maximum total debt
         if(this.selectedCategory == null) {
             this.maxTotal = 0;
             for (let i = 1; i < column; i++) {
@@ -271,7 +223,7 @@ function sgDebt(){
                     this.maxTotal = this.columnTotal;
                 }
             }
-        } else {
+        } else { //calculate maximum total debt for selected category
             this.maxTotal = 0;
             for (let i = 1; i < column; i++) {
                 this.columnTotal = 0;

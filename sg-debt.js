@@ -16,11 +16,11 @@ function sgDebt(){
     this.data;
     this.layout;
     this.selectedCategory = null;
+    this.maxTotalCalculated = false;
 
     //Names for each axis
     this.xAxisLabel = 'Quarter';
-    this.yAxisLabel = 'Debt (SGD)';
-
+    this.yAxisLabel = 'Debt (Millions)';
 
     let marginSize = 50;
 
@@ -71,16 +71,11 @@ function sgDebt(){
         background(220);
 
         //find the highest total for each column
-        this.maxTotal = 0;
-        for (let i = 1; i < this.data.getColumnCount(); i++) {
-            this.columnTotal = 0;
-            for (let j = 1; j < this.data.getRowCount(); j++){
-                this.columnTotal += this.data.getNum(j, i);
-            }
-            if (this.columnTotal > this.maxTotal){
-                this.maxTotal = this.columnTotal;
-            }
+        if(this.maxTotalCalculated == false){
+            this.calculateMaxTotal(this.data.getColumnCount(),this.data.getRowCount());
+            this.maxTotalCalculated = true;
         }
+        
         // Count the number of frames drawn since the visualisation
         // started so that we can animate the plot.
         this.frameCount = 0;
@@ -100,15 +95,31 @@ function sgDebt(){
         if (mouseIsPressed) {
             this.mousePressed();
         }
-
+        if(this.maxTotalCalculated == false){
+            if(this.selectedCategory == null) {
+                this.calculateMaxTotal(this.data.getColumnCount(),this.data.getRowCount());
+            } else {
+                this.calculateMaxTotal(this.data.getColumnCount(),this.selectedCategory + 1);
+            }
+            this.maxTotalCalculated = true;
+        }
         this.drawLabels();
         this.drawData();
         this.drawLegend();
-        console.log(this.selectedCategory);
     }
         
     this.drawLabels = function() {
-        // Draw x and y axis.
+        // Draw title.
+        fill(0);
+        noStroke();
+        textAlign('center', 'center');
+        textSize(30);
+        text(this.title,
+            (this.layout.plotWidth() / 2) + this.layout.leftMargin,
+            this.layout.marginSize/2);
+        textSize(16);
+
+            // Draw x and y axis.
         drawAxis(this.layout);
 
         // Draw x and y axis labels.
@@ -136,6 +147,10 @@ function sgDebt(){
                 i * distTick + this.layout.leftMargin + this.layout.marginSize/2,
                 this.layout.bottomMargin + textSize());
         }   
+
+        if(this.maxTotal == 0) {
+            text('Debt is 0', this.layout.leftMargin + this.layout.plotWidth()/2, this.layout.topMargin + this.layout.plotHeight()/2);
+        }
     }
 
     this.drawData = function() {
@@ -163,7 +178,6 @@ function sgDebt(){
 
         for (let i = 1; i < this.data.getRowCount(); i++) {
             if (this.selectedCategory !== null && i !== this.selectedCategory) {
-                console.log(i);
                 continue;
             }    
             fill(i * 30, i * 30, i * 30, 150);
@@ -194,13 +208,13 @@ function sgDebt(){
 
     this.drawLegend = function(){
         // Draw legend
-        fill(255);
+        fill(0);
         noStroke();
         textAlign(LEFT);
         var textY = this.layout.topMargin + this.layout.pad;
         var textX = this.layout.leftMargin + this.layout.pad * 2;
 
-        text('Legend', textX, textY);
+        text('Legend', textX, textY + this.layout.pad);
         for (var i = 1; i < this.data.getRowCount(); i++) {
             textY += textSize() + this.layout.pad;
             fill(i * 30, i * 30, i * 30, 150);
@@ -235,10 +249,38 @@ function sgDebt(){
             if (mouseX > this.layout.leftMargin && mouseX < this.layout.leftMargin + 50 &&
                 mouseY > textY && mouseY < textY + 10) {
                 this.selectedCategory = i;
+                this.maxTotalCalculated = false;
+
                 return;
             }
         }
     
         this.selectedCategory = null;
-    };
+        this.maxTotalCalculated = false;
+
+    }
+    this.calculateMaxTotal = function(column, row) {
+        if(this.selectedCategory == null) {
+            this.maxTotal = 0;
+            for (let i = 1; i < column; i++) {
+                this.columnTotal = 0;
+                for (let j = 1; j < row; j++){
+                    this.columnTotal += this.data.getNum(j, i);
+                }
+                if (this.columnTotal > this.maxTotal){
+                    this.maxTotal = this.columnTotal;
+                }
+            }
+        } else {
+            this.maxTotal = 0;
+            for (let i = 1; i < column; i++) {
+                this.columnTotal = 0;
+                this.columnTotal += this.data.getNum(this.selectedCategory, i);
+                if (this.columnTotal > this.maxTotal){
+                    this.maxTotal = this.columnTotal;
+                }
+            }
+        }
+    }
+    
 }

@@ -3,8 +3,10 @@ function PieChart(x, y, diameter) {
     this.x = x;
     this.y = y;
     this.diameter = diameter;
+    this.hoveredSlice = -1; // -1 means no slice is hovered. 
     this.labelSpace = 30;
-
+    this.current_angles = [];
+    this.target_angles = [];
     this.get_radians = function(data) {
         var total = sum(data);
         var radians = [];
@@ -31,9 +33,17 @@ function PieChart(x, y, diameter) {
             Arrays must be the same length!`);
         }
 
-        // https://p5js.org/examples/form-pie-chart.html
+        if (this.current_angles.length == 0) {
+            this.current_angles = this.get_radians(data);
+            this.target_angles = this.current_angles; 
+        }
+    
+        // Animate the pie slices using lerp()
+        for (let i = 0; i < this.current_angles.length; i++) {
+            this.current_angles[i] = lerp(this.current_angles[i], this.target_angles[i], 0.1);
+        }
 
-        var angles = this.get_radians(data);
+        var angles = this.current_angles;
         var lastAngle = 0;
         var colour;
 
@@ -49,10 +59,16 @@ function PieChart(x, y, diameter) {
             stroke(0);
             strokeWeight(1);
 
-            arc(this.x, this.y,
-                this.diameter, this.diameter,
-                lastAngle, lastAngle + angles[i] + 0.001); // Hack for 0!
-
+            //pop up if hovered
+            if (this.hoveredSlice == i) {
+                arc(this.x, this.y,
+                    this.diameter * 1.1, this.diameter * 1.1,
+                    lastAngle, lastAngle + angles[i] + 0.001);
+            } else { //otherwise draw normally
+                arc(this.x, this.y,
+                    this.diameter, this.diameter,
+                    lastAngle, lastAngle + angles[i] + 0.001);
+            }
             if (labels) {
                 // Calculate the total value of data
                 var totalValue = data.reduce((acc, value) => acc + value, 0);
@@ -92,7 +108,33 @@ function PieChart(x, y, diameter) {
         fill('black');
         noStroke();
         textAlign('left', 'center');
-        textSize(12);
+        if(this.hoveredSlice == i){
+            textSize(30);
+
+        } else {
+            textSize(16);
+        }
         text(label, x + boxWidth + 10, y + boxWidth / 2);
+    };
+
+    //determine which slice is hovered
+    this.handleMouseHover = function(mX, mY) {
+        let distanceFromCenter = dist(mX, mY, 0, 0);
+        if (distanceFromCenter <= this.diameter / 2) {
+            let angle = atan2(mY, mX);
+            if (angle < 0) {
+                angle += TWO_PI;
+            }
+            let totalAngle = 0;
+            for (let i = 0; i < this.current_angles.length; i++) {
+                totalAngle += this.current_angles[i];
+                if (angle <= totalAngle) {
+                    this.hoveredSlice = i;
+                    return;
+                }
+            }
+        }
+        //reset the hovered slice if the mouse is not over the pie chart
+        this.hoveredSlice = -1;
     };
 }

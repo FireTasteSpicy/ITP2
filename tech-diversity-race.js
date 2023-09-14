@@ -25,8 +25,8 @@ function TechDiversityRace() {
 
     this.setup = function() {
         if (!this.loaded) {
-        console.log('Data not yet loaded');
-        return;
+            console.log('Data not yet loaded');
+            return;
         }
 
         // Create a select DOM element.
@@ -37,8 +37,18 @@ function TechDiversityRace() {
         var companies = this.data.columns;
         // First entry is empty.
         for (let i = 1; i < companies.length; i++) {
-        this.select.option(companies[i]);
+            this.select.option(companies[i]);
         }
+
+        // Handle company change and update the target angles
+        this.select.changed(() => {
+            var selectedCompany = this.select.value();
+            var newCol = this.data.getColumn(selectedCompany);
+            newCol = stringsToNumbers(newCol);
+            
+            // Update the target angles in pie chart
+            this.pie.target_angles = this.pie.get_radians(newCol);
+        });
     };
 
     this.destroy = function() {
@@ -50,8 +60,8 @@ function TechDiversityRace() {
 
     this.draw = function() {
         if (!this.loaded) {
-        console.log('Data not yet loaded');
-        return;
+            console.log('Data not yet loaded');
+            return;
         }
 
         // Get the value of the company we're interested in from the
@@ -75,5 +85,16 @@ function TechDiversityRace() {
 
         // Draw the pie chart!
         this.pie.draw(col, labels, colours, title);
+
+        this.mouseMoved();
+    };
+    // Check if the mouse is over the canvas area where the pie chart is displayed
+    this.mouseMoved = function (){
+        let canvasLeft = 0, canvasTop = 0, canvasRight = width, canvasBottom = height;
+        if (mouseX > canvasLeft && mouseX < canvasRight && mouseY > canvasTop && mouseY < canvasBottom) {
+            let mX = mouseX - this.pie.x;
+            let mY = mouseY - this.pie.y;
+            this.pie.handleMouseHover(mX, mY);
+        }
     };
 }

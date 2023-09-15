@@ -10,22 +10,20 @@ function PieChart(x, y, diameter) {
     this.get_radians = function(data) {
         var total = sum(data);
         var radians = [];
-
         for (let i = 0; i < data.length; i++) {
-        radians.push((data[i] / total) * TWO_PI);
+            radians.push((data[i] / total) * TWO_PI);
         }
 
         return radians;
     };
 
     this.draw = function(data, labels, colours, title, total) {
-
         // Test that data is not empty and that each input array is the
         // same length.
         if (data.length == 0) {
-        alert('Data has length zero!');
+            alert('Data has length zero!');
         } else if (![labels, colours].every((array) => {
-        return array.length == data.length;
+            return array.length == data.length;
         })) {
         alert(`Data (length: ${data.length})
             Labels (length: ${labels.length})
@@ -77,20 +75,17 @@ function PieChart(x, y, diameter) {
                 var percentage = ((data[i] / totalValue) * 100).toFixed(2);
                 this.makeLegendItem(labels[i] + ' (' + percentage + '%)', i, colour);
             }
-
-
-
             
             lastAngle += angles[i];
-            }
+        }
 
-            if (title) {
-                noStroke();
-                textAlign('center', 'center');
-                textSize(24);
-                text(title, this.x, this.y - this.diameter * 0.6);
-            }
-        };
+        if (title) {
+            noStroke();
+            textAlign('center', 'center');
+            textSize(24);
+            text(title, this.x, this.y - this.diameter * 0.6);
+        }
+    };
 
     this.makeLegendItem = function(label, i, colour) {
         var x = this.x + 50 + this.diameter / 2;

@@ -1,17 +1,13 @@
-    function Gallery() {
-
+function Gallery() {
     this.visuals = [];
     this.selectedVisual = null;
     var self = this;
 
-
     // Add a new visualisation to the navigation bar.
     this.addVisual = function(vis) {
-
         // Check that the vis object has an id and name.
-        if (!vis.hasOwnProperty('id')
-            && !vis.hasOwnProperty('name')) {
-        alert('Make sure your visualisation has an id and name!');
+        if (!vis.hasOwnProperty('id') && !vis.hasOwnProperty('name')) {
+            alert('Make sure your visualisation has an id and name!');
         }
 
         // Check that the vis object has a unique id.
@@ -20,7 +16,6 @@
         }
 
         this.visuals.push(vis);
-        
     
         // Create menu item.
         var menuItem = createElement('li', vis.name);
@@ -28,8 +23,7 @@
         menuItem.id(vis.id);
         
         menuItem.mouseOver(function(e)
-        {
-            
+        {   
             var el = select('#' + e.srcElement.id);
             el.addClass("hover");
         })
@@ -45,26 +39,23 @@
             //remove selected class from any other menu-items
             
             var menuItems = selectAll('.menu-item');
-            
             for(var i = 0; i < menuItems.length; i++)
             {
                 menuItems[i].removeClass('selected');
             }
             
             var el = select('#' + e.srcElement.id);
-            el.addClass('selected');
-            
+            el.addClass('selected'); 
             self.selectVisual(e.srcElement.id);
             
         })
-        
-        
+          
         var visMenu = select('#visuals-menu');
         visMenu.child(menuItem);
 
         // Preload data if necessary.
         if (vis.hasOwnProperty('preload')) {
-        vis.preload();
+            vis.preload();
         }
     };
 
@@ -72,9 +63,9 @@
         // Search through the visualisations looking for one with the id
         // matching visId.
         for (var i = 0; i < this.visuals.length; i++) {
-        if (this.visuals[i].id == visId) {
-            return i;
-        }
+            if (this.visuals[i].id == visId) {
+                return i;
+            }
         }
 
         // Visualisation not found.

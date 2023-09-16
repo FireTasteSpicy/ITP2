@@ -90,8 +90,7 @@ function TechDiversityRace() {
     };
     // Check if the mouse is over the canvas area where the pie chart is displayed
     this.mouseMoved = function (){
-        let canvasLeft = 0, canvasTop = 0, canvasRight = width, canvasBottom = height;
-        if (mouseX > canvasLeft && mouseX < canvasRight && mouseY > canvasTop && mouseY < canvasBottom) {
+        if (mouseX > 0 && mouseX < width && mouseY > 0 && mouseY < height) {
             let mX = mouseX - this.pie.x;
             let mY = mouseY - this.pie.y;
             this.pie.handleMouseHover(mX, mY);

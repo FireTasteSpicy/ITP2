@@ -2,14 +2,14 @@ function sgDebt(){
     // Initialize object properties
     this.name = 'SG Debt';
     this.id = 'sg-debt';
-    this.title = 'SG Debt';
+    this.title = 'SG Debt (SGD)';
     this.loaded = false;  // Flag to check if data is loaded
     this.selectedCategory = null;  // Holds the selected debt category
     this.maxTotalCalculated = false;  // Flag to check if maxTotal is calculated
 
     // Axis labels
     this.xAxisLabel = 'Quarter';
-    this.yAxisLabel = 'Debt (SGD)';
+    this.yAxisLabel = 'Debt (Millions)';
 
     // Layout configuration
     let marginSize = 50;
@@ -169,7 +169,7 @@ function sgDebt(){
         var textY = this.layout.topMargin + this.layout.pad;
         var textX = this.layout.leftMargin + this.layout.pad * 2;
 
-        text('Legend', textX, textY + this.layout.pad);
+        text('Legend (Click to select specific debt)', textX, textY + this.layout.pad);
         for (var i = 1; i < this.data.getRowCount(); i++) {
             textY += textSize() + this.layout.pad;
             fill(i * 30, i * 30, i * 30, 150);
@@ -234,5 +234,4 @@ function sgDebt(){
             }
         }
     }
-    
 }

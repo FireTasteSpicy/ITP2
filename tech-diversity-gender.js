@@ -7,6 +7,7 @@ function TechDiversityGender() {
     // characters.
     this.id = 'tech-diversity-gender';
 
+
     // Layout object to store all common plot layout parameters and
     // methods.
     this.layout = {
@@ -58,12 +59,17 @@ function TechDiversityGender() {
     this.setup = function() {
         // Font defaults.
         textSize(16);
+        this.animationProgress = 0;
     };
 
     this.destroy = function() {
     };
 
     this.draw = function() {
+        if(this.animationProgress < 100) {
+            this.animationProgress += 1;
+        }
+
         if (!this.loaded) {
         console.log('Data not yet loaded');
         return;
@@ -96,20 +102,21 @@ function TechDiversityGender() {
             this.layout.leftMargin - this.layout.pad,
             lineY);
 
-        // Draw female employees rectangle.
-        fill(this.femaleColour);
-        rect(this.layout.leftMargin,
-            lineY,
-            this.mapPercentToWidth(company.female),
-            lineHeight - this.layout.pad);
+        // Calculate the y position for each company.
+        var lineY = (lineHeight * i) + this.layout.topMargin;
 
-        // Draw male employees rectangle.
+        // For female employees
+        let barLengthFemale = this.mapPercentToWidth(company.female);
+        let animatedBarLengthFemale = map(this.animationProgress, 0, 100, 0, barLengthFemale);
+        fill(this.femaleColour);
+        rect(this.layout.leftMargin, lineY, animatedBarLengthFemale, lineHeight - this.layout.pad);
+
+        // For male employees
+        let barLengthMale = this.mapPercentToWidth(company.male);
+        let animatedBarLengthMale = map(this.animationProgress, 0, 100, 0, barLengthMale);
         fill(this.maleColour);
-        rect(this.layout.leftMargin + this.mapPercentToWidth(company.female),
-            lineY,
-            this.mapPercentToWidth(company.male),
-            lineHeight - this.layout.pad);
-        }
+        rect(this.layout.leftMargin + animatedBarLengthFemale, lineY, animatedBarLengthMale, lineHeight - this.layout.pad);
+    }
 
         // Draw 50% line
         stroke(150);
@@ -118,6 +125,13 @@ function TechDiversityGender() {
             this.layout.topMargin,
             this.midX,
             this.layout.bottomMargin);
+
+        console.log(this.animationProgress);
+
+        // If animation is complete, you might want to stop the draw loop
+        if (this.animationProgress == 100) {
+            noLoop();
+        }
 
     };
 
@@ -145,4 +159,4 @@ function TechDiversityGender() {
                 0,
                 this.layout.plotWidth());
     };
-    }
+}

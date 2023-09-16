@@ -59,27 +59,31 @@ function TechDiversityGender() {
     this.setup = function() {
         // Font defaults.
         textSize(16);
+        // Reset animation progress
         this.animationProgress = 0;
+
     };
 
     this.destroy = function() {
     };
 
     this.draw = function() {
-        if(this.animationProgress < 100) {
+
+        //Ensures that the animation progress is capped at 100
+        if (this.animationProgress < 100){
             this.animationProgress += 1;
         }
-
+        
+        // Check if the data has been loaded before drawing.
         if (!this.loaded) {
-        console.log('Data not yet loaded');
-        return;
+            console.log('Data not yet loaded');
+            return;
         }
 
         // Draw Female/Male labels at the top of the plot.
         this.drawCategoryLabels();
 
-        var lineHeight = (height - this.layout.topMargin) /
-            this.data.getRowCount();
+        var lineHeight = (height - this.layout.topMargin) /this.data.getRowCount();
 
         for (var i = 0; i < this.data.getRowCount(); i++) {
 
@@ -116,6 +120,8 @@ function TechDiversityGender() {
         let animatedBarLengthMale = map(this.animationProgress, 0, 100, 0, barLengthMale);
         fill(this.maleColour);
         rect(this.layout.leftMargin + animatedBarLengthFemale, lineY, animatedBarLengthMale, lineHeight - this.layout.pad);
+
+        this.mouseOver(animatedBarLengthFemale, animatedBarLengthMale, lineY, lineHeight, company);
     }
 
         // Draw 50% line
@@ -127,14 +133,9 @@ function TechDiversityGender() {
             this.layout.bottomMargin);
 
         console.log(this.animationProgress);
-
-        // If animation is complete, you might want to stop the draw loop
-        if (this.animationProgress == 100) {
-            noLoop();
-        }
-
     };
 
+    // Draw the category labels above the plot.
     this.drawCategoryLabels = function() {
         fill(0);
         noStroke();
@@ -152,6 +153,7 @@ function TechDiversityGender() {
             this.layout.pad);
     };
 
+    // Helper Function
     this.mapPercentToWidth = function(percent) {
         return map(percent,
                 0,
@@ -159,4 +161,30 @@ function TechDiversityGender() {
                 0,
                 this.layout.plotWidth());
     };
+
+    this.mouseOver = function(animatedBarLengthFemale, animatedBarLengthMale, lineY, lineHeight, company) {
+        // Check if mouse is over the female bar and display percentage
+        if (mouseX >= this.layout.leftMargin && mouseX <= (this.layout.leftMargin + animatedBarLengthFemale) &&
+            mouseY >= lineY && mouseY <= (lineY + lineHeight - this.layout.pad)) {
+            fill(255);
+            rectMode(CENTER);
+            rect(mouseX, mouseY - 10, 40, 20);
+            fill(0);
+            textAlign(CENTER, CENTER);
+            text(company.female + '%', mouseX, mouseY - 10);
+            rectMode(CORNER);
+        }
+
+        // Check if mouse is over the male bar and display percentage
+        if (mouseX >= (this.layout.leftMargin + animatedBarLengthFemale) && mouseX <= (this.layout.leftMargin + animatedBarLengthFemale + animatedBarLengthMale) &&
+            mouseY >= lineY && mouseY <= (lineY + lineHeight - this.layout.pad)) {
+            fill(255);
+            rectMode(CENTER);
+            rect(mouseX, mouseY - 10, 40, 20);
+            fill(0);
+            textAlign(CENTER, CENTER);
+            text(company.female + '%', mouseX, mouseY - 10);
+            rectMode(CORNER);
+        }
+    }
 }

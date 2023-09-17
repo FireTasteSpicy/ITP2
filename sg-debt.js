@@ -199,7 +199,7 @@ function sgDebt(){
         var textY = this.layout.topMargin + this.layout.pad;
         for (var i = 1; i < this.data.getRowCount(); i++) {
             textY += textSize() + this.layout.pad;
-            if (mouseX > this.layout.leftMargin && mouseX < this.layout.leftMargin + 50 &&
+            if (mouseX > this.layout.leftMargin + this.layout.pad && mouseX < this.layout.leftMargin + 50 &&
                 mouseY > textY && mouseY < textY + 10) {
                 this.selectedCategory = i;
                 this.maxTotalCalculated = false;

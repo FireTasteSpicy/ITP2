@@ -17,7 +17,7 @@ function PieChart(x, y, diameter) {
         return radians;
     };
 
-    this.draw = function(data, labels, colours, title, total) {
+    this.draw = function(data, labels, colours, title) {
         // Test that data is not empty and that each input array is the
         // same length.
         if (data.length == 0) {
@@ -75,7 +75,7 @@ function PieChart(x, y, diameter) {
                 var percentage = ((data[i] / totalValue) * 100).toFixed(2);
                 this.makeLegendItem(labels[i] + ' (' + percentage + '%)', i, colour);
             }
-            
+            // Update the last angle
             lastAngle += angles[i];
         }
 
@@ -94,9 +94,6 @@ function PieChart(x, y, diameter) {
         var boxHeight = this.labelSpace / 2;
 
         // Adjust the position of the text
-        var textX = x + boxWidth + 20;
-        var textY = y + boxHeight / 2 + 3;
-        
         fill(colour);
         rect(x, y, boxWidth, boxHeight);
 

@@ -145,7 +145,7 @@ function PayGapTimeSeries() {
         previous = current;
         }
     };
-
+    //Draws Title
     this.drawTitle = function() {
         fill(0);
         noStroke();
@@ -155,7 +155,7 @@ function PayGapTimeSeries() {
             (this.layout.plotWidth() / 2) + this.layout.leftMargin,
             this.layout.topMargin - (this.layout.marginSize / 2));
     };
-
+    // Convert a year to a width coordinate.
     this.mapYearToWidth = function(value) {
         return map(value,
                 this.startYear,
@@ -163,7 +163,7 @@ function PayGapTimeSeries() {
                 this.layout.leftMargin,   // Draw left-to-right from margin.
                 this.layout.rightMargin);
     };
-
+    // Converts the pay gap to a height in the canvas.
     this.mapPayGapToHeight = function(value) {
         return map(value,
                 this.minPayGap,
@@ -171,4 +171,4 @@ function PayGapTimeSeries() {
                 this.layout.bottomMargin, // Smaller pay gap at bottom.
                 this.layout.topMargin);   // Bigger pay gap at top.
     };
-    }
+}

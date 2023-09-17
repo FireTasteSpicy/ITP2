@@ -28,7 +28,7 @@ function TechDiversityRace() {
             console.log('Data not yet loaded');
             return;
         }
-        
+
         var self = this;
 
         // Create a select DOM element.
@@ -53,6 +53,7 @@ function TechDiversityRace() {
         });
     };
 
+    // Destroy the DOM elements and clear event listeners
     this.destroy = function() {
         this.select.remove();
     };

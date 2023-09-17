@@ -133,6 +133,7 @@ function foodDataUK(){
             var lines = this.calcLines(this.name, textBoxSize);
             var textHeight = lines * lineHeight;
             this.wrapText(this.name, this.pos.x, this.pos.y - textHeight / 2, textBoxSize, lineHeight);
+            // Display data when mouse is over the bubble
             if(this.mouseOver()) {
                 textSize(16);
                 fill(0);
@@ -154,7 +155,6 @@ function foodDataUK(){
 
                     if(d < this.size/2 + _bubbles[i].size/2){
                         if(d > 0){
-
                             this.direction.add(v)
                         }else{
                             this.direction.add(p5.Vector.random2D());    
@@ -212,11 +212,10 @@ function foodDataUK(){
             let words = labels.split(' ');
             let line = '';
             let yoffset = y;
-
+            // If the line is too long, create a new line
             for(let n = 0; n < words.length; n++) {
                 let testLine = line + words[n] + ' ';
                 let testWidth = textWidth(testLine);
-
                 if(testWidth > maxWidth && n > 0) {
                     text(line, x, yoffset);
                     line = words[n] + ' ';

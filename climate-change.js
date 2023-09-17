@@ -236,7 +236,7 @@ function ClimateChange() {
                   this.layout.topMargin + 60
             );
         };
-
+        // Convert a year to a width coordinate.
         this.mapYearToWidth = function(value) {
             return map(value,
                     this.startYear,
@@ -244,7 +244,7 @@ function ClimateChange() {
                     this.layout.leftMargin,   // Draw left-to-right from margin.
                     this.layout.rightMargin);
         };
-
+        // Convert a temperature to a height in the canvas.
         this.mapTemperatureToHeight = function(value) {
             return map(value,
                     this.minTemperature,
@@ -252,7 +252,7 @@ function ClimateChange() {
                     this.layout.bottomMargin, // Lower temperature at bottom.
                     this.layout.topMargin);   // Higher temperature at top.
         };
-
+        // Convert a temperature to a colour.
         this.mapTemperatureToColour = function(value) {
             var red =  map(value,
                         this.minTemperature,

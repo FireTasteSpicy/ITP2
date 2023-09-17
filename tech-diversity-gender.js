@@ -183,7 +183,7 @@ function TechDiversityGender() {
             rect(mouseX, mouseY - 10, 40, 20);
             fill(0);
             textAlign(CENTER, CENTER);
-            text(company.female + '%', mouseX, mouseY - 10);
+            text(company.male + '%', mouseX, mouseY - 10);
             rectMode(CORNER);
         }
     }

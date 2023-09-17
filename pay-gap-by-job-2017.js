@@ -46,18 +46,9 @@ function PayGapByJob2017() {
 
         // Get data from the table object.
         // Data for the chart
-        var jobs = this.data.getColumn('job_subtype');
         var propFemale = this.data.getColumn('proportion_female');
         var payGap = this.data.getColumn('pay_gap');
         var numJobs = this.data.getColumn('num_jobs');
-        
-        // Data for info box
-        var jobType = this.data.getColumn('job_type');
-        var jobSubType = this.data.getColumn('job_subtype');
-        var numJobsMale = this.data.getColumn('num_jobs_male');
-        var medianMale = this.data.getColumn('median_male');
-        var numJobsFemale = this.data.getColumn('num_jobs_female');
-        var medianFemale = this.data.getColumn('median_female');
         
         // Convert numerical data from strings to numbers.
         propFemale = stringsToNumbers(propFemale);

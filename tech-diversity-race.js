@@ -28,6 +28,8 @@ function TechDiversityRace() {
             console.log('Data not yet loaded');
             return;
         }
+        
+        var self = this;
 
         // Create a select DOM element.
         this.select = createSelect();
@@ -41,13 +43,13 @@ function TechDiversityRace() {
         }
 
         // Handle company change and update the target angles
-        this.select.changed(() => {
-            var selectedCompany = this.select.value();
-            var newCol = this.data.getColumn(selectedCompany);
+        this.select.changed(function() {
+            var selectedCompany = self.select.value();
+            var newCol = self.data.getColumn(selectedCompany);
             newCol = stringsToNumbers(newCol);
             
             // Update the target angles in pie chart
-            this.pie.target_angles = this.pie.get_radians(newCol);
+            self.pie.target_angles = self.pie.get_radians(newCol);
         });
     };
 

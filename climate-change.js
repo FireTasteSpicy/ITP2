@@ -27,11 +27,11 @@ function ClimateChange() {
         pad: 5,
 
         plotWidth: function() {
-        return this.rightMargin - this.leftMargin;
+            return this.rightMargin - this.leftMargin;
         },
 
         plotHeight: function() {
-        return this.bottomMargin - this.topMargin;
+            return this.bottomMargin - this.topMargin;
         },
 
         // Boolean to enable/disable background grid.
@@ -101,8 +101,8 @@ function ClimateChange() {
 
     this.draw = function() {
         if (!this.loaded) {
-        console.log('Data not yet loaded');
-        return;
+            console.log('Data not yet loaded');
+            return;
         }
 
         // Calculate the average temperature change for the displayed data range.
@@ -119,7 +119,7 @@ function ClimateChange() {
 
         // Prevent slider ranges overlapping.
         if (this.startSlider.value() >= this.endSlider.value()) {
-        this.startSlider.value(this.endSlider.value() - 1);
+            this.startSlider.value(this.endSlider.value() - 1);
         }
         this.startYear = this.startSlider.value();
         this.endYear = this.endSlider.value();
